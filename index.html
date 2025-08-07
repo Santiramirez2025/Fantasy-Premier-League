@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fantasy Premier League Live</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="season-info">
+                <i class="fas fa-calendar-alt"></i>
+                Season 2025-26
+            </div>
+            <h1><i class="fas fa-trophy"></i> Fantasy Premier League Live</h1>
+            <p>
+                Real-Time Competition • Starts Friday, August 15th 2025
+                <span class="gameweek-info" id="gameweekInfo">Pre-season</span>
+            </p>
+            <div class="connection-status" id="connectionStatus">
+                <i class="fas fa-wifi"></i> Connecting...
+            </div>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <nav class="tabs">
+            <button class="tab active" data-tab="dashboard">
+                <i class="fas fa-chart-line"></i> Dashboard
+            </button>
+            <button class="tab" data-tab="teams">
+                <i class="fas fa-users"></i> My Teams
+            </button>
+            <button class="tab" data-tab="live">
+                <i class="fas fa-satellite-dish"></i> Live
+            </button>
+            <button class="tab" data-tab="rules">
+                <i class="fas fa-book"></i> Rules
+            </button>
+        </nav>
+
+        <!-- Dashboard Tab -->
+        <div class="tab-content active" id="dashboard">
+            <!-- Live Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <i class="fas fa-play-circle"></i>
+                    <h3 id="liveMatches">0</h3>
+                    <p>Live Matches</p>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-clock"></i>
+                    <h3 id="todayMatches">0</h3>
+                    <p>Today's Matches</p>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-trophy"></i>
+                    <h3 id="totalPoints">0</h3>
+                    <p>Total Points</p>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-sync-alt"></i>
+                    <h3 id="lastUpdate">--:--</h3>
+                    <p>Last Update</p>
+                </div>
+            </div>
+
+            <!-- Leaderboard -->
+            <div class="leaderboard">
+                <h2><i class="fas fa-crown"></i> Overall Standings</h2>
+                <div id="leaderboardContent">
+                    <div class="loading">
+                        <i class="fas fa-spinner"></i>
+                        <p>Loading standings...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Players Grid -->
+            <div class="players-grid" id="playersGrid">
+                <div class="loading">
+                    <i class="fas fa-spinner"></i>
+                    <p>Loading players...</p>
+                </div>
+            </div>
+
+            <!-- Admin Controls -->
+            <div class="admin-controls">
+                <h3><i class="fas fa-cogs"></i> Admin Controls</h3>
+                <div class="control-buttons">
+                    <button class="btn" onclick="fantasyGame.simulateWeeklyUpdate()">
+                        <i class="fas fa-play"></i> Simulate Gameweek
+                    </button>
+                    <button class="btn" onclick="fantasyGame.calculateLivePoints()">
+                        <i class="fas fa-calculator"></i> Calculate Points
+                    </button>
+                    <button class="btn" onclick="fantasyGame.forceUpdate()">
+                        <i class="fas fa-sync"></i> Force Update
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Teams Tab -->
+        <div class="tab-content" id="teams">
+            <div class="team-selector">
+                <div class="selector-header">
+                    <h2><i class="fas fa-hand-pointer"></i> Select Your 5 Teams</h2>
+                    <div class="player-switcher">
+                        <label>Current Player:</label>
+                        <select id="currentPlayerSelect" onchange="fantasyGame.switchPlayer(this.value)">
+                            <option value="0">Ashley</option>
+                            <option value="1">Aaron</option>
+                            <option value="2">Steve</option>
+                            <option value="3">Phil</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="selection-info">
+                    <p>Teams selected: <span id="selectedCount">0</span>/5</p>
+                    <p>Total value: €<span id="totalValue">0</span>M</p>
+                </div>
+                
+                <div class="teams-grid" id="teamsAvailable">
+                    <div class="loading">
+                        <i class="fas fa-spinner"></i>
+                        <p>Loading teams...</p>
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="fantasyGame.saveTeamSelection()">
+                        <i class="fas fa-save"></i> Save Selection
+                    </button>
+                    <button class="btn btn-secondary" onclick="fantasyGame.clearSelection()">
+                        <i class="fas fa-trash"></i> Clear
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Live Tab -->
+        <div class="tab-content" id="live">
+            <div class="live-section">
+                <h2><i class="fas fa-satellite-dish"></i> Live Matches</h2>
+                <div class="auto-refresh">
+                    <label>
+                        <input type="checkbox" id="autoRefresh" checked>
+                        Auto refresh (30s)
+                    </label>
+                </div>
+                
+                <div id="liveMatches">
+                    <div class="loading">
+                        <i class="fas fa-spinner"></i>
+                        <p>Loading live matches...</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="fixtures-section">
+                <h2><i class="fas fa-calendar"></i> Upcoming Fixtures</h2>
+                <div id="upcomingMatches">
+                    <div class="loading">
+                        <i class="fas fa-spinner"></i>
+                        <p>Loading upcoming matches...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rules Tab -->
+        <div class="tab-content" id="rules">
+            <div class="rules-grid">
+                <div class="rule-card">
+                    <h3><i class="fas fa-futbol"></i> Matchday Scoring</h3>
+                    <div class="rule-item">
+                        <span>Win</span>
+                        <span class="rule-points positive">+3 points</span>
+                    </div>
+                    <div class="rule-item">
+                        <span>Goal scored</span>
+                        <span class="rule-points positive">+1 point</span>
+                    </div>
+                    <div class="rule-item">
+                        <span>Every 2 goals conceded</span>
+                        <span class="rule-points negative">-1 point</span>
+                    </div>
+                </div>
+
+                <div class="rule-card">
+                    <h3><i class="fas fa-trophy"></i> Achievement Bonuses</h3>
+                    <div class="rule-item">
+                        <span>Golden Boot winner</span>
+                        <span class="rule-points positive">+10 points</span>
+                    </div>
+                    <div class="rule-item">
+                        <span>Top Assister</span>
+                        <span class="rule-points positive">+5 points</span>
+                    </div>
+                    <div class="rule-item">
+                        <span>League winner</span>
+                        <span class="rule-points positive">+15 points</span>
+                    </div>
+                    <div class="rule-item">
+                        <span>Top 4 finish</span>
+                        <span class="rule-points positive">+5 points</span>
+                    </div>
+                </div>
+
+                <div class="rule-card">
+                    <h3><i class="fas fa-chart-line"></i> Performance Bonuses</h3>
+                    <div class="rule-item">
+                        <span>Per position above expected</span>
+                        <span class="rule-points positive">+10 points</span>
+                    </div>
+                </div>
+
+                <div class="rule-card">
+                    <h3><i class="fas fa-shield-alt"></i> Underdog & Relegation Rules</h3>
+                    <div class="rule-item">
+                        <span>Beat team worth 2x more</span>
+                        <span class="rule-points positive">+5 points</span>
+                    </div>
+                    <div class="rule-item">
+                        <span>Promoted team avoids relegation</span>
+                        <span class="rule-points positive">+15 points</span>
+                    </div>
+                    <div class="rule-item">
+                        <span>Non-promoted team relegated</span>
+                        <span class="rule-points negative">-15 points</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Container -->
+    <div id="notifications"></div>
+
+    <!-- Modal Container -->
+    <div id="modalContainer"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
